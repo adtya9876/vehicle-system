@@ -47,12 +47,6 @@ class CarController {
     Resources<Resource<Car>> list() {
         List<Resource<Car>> resources = carService.list().stream().map(assembler::toResource)
                 .collect(Collectors.toList());
-        if(resources != null) {
-            System.out.println("not null");
-            System.out.println(resources);
-        }
-        else
-            System.out.println("null");
         return new Resources<>(resources,
                 linkTo(methodOn(CarController.class).list()).withSelfRel());
     }
