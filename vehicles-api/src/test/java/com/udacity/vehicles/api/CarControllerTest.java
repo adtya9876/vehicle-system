@@ -150,13 +150,22 @@ public class CarControllerTest {
         details.setNumberOfDoors(2);
         car.setDetails(details);
         car.setCondition(Condition.NEW);
-        mvc.perform(put("/cars/" + car.getId())
-                .content(json.write(car).getJson())
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.APPLICATION_JSON_VALUE))
+
+        given(carService.save(any())).willReturn(car);
+        given(carService.findById(any())).willReturn(car);
+
+        mvc.perform(put("/cars/" + car.getId()).header("Content-Type",MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .content(json.write(car).getJson()))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(car.getId()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.condition").value("NEW"));
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.condition").value("NEW"))
+                .andExpect(jsonPath("$.details.model").value("R8"))
+                .andExpect(jsonPath("$.details.manufacturer.name").value("Audi"))
+                .andDo(print());
+
+
+
     }
 
     /**
