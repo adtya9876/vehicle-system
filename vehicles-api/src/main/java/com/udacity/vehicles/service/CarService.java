@@ -6,7 +6,7 @@ import com.udacity.vehicles.domain.Location;
 import com.udacity.vehicles.domain.car.Car;
 import com.udacity.vehicles.domain.car.CarRepository;
 
-import java.util.List;
+import java.util.*;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -40,8 +40,32 @@ public class CarService {
      * @return a list of all vehicles in the CarRepository
      */
     public List<Car> list() {
+      List<Car> allCars = new ArrayList<>();
+      int allCarsSize = repository.findAll().size();
+
+      for(int i = 1;i <=allCarsSize; i++) {
+        // Finding each car and adding price and location client to each.
+        Car car = findCarByIdList((long) i);
+        allCars.add(car);
+      }
         return repository.findAll();
     }
+
+    public Car findCarByIdList(Long id) {
+      Car car = new Car();
+      Optional<Car> optionalCar = repository.findById(id);
+      if(optionalCar.isPresent()) {
+        car = optionalCar.get();
+// Setiing Price for each car id.
+        String newPrice = priceClient.getPrice(id);
+        car.setPrice(newPrice);
+// Setiing location for each car id.
+        Location location = car.getLocation();
+        car.setLocation(mapsClient.getAddress(location));
+      }
+      return car;
+    }
+
 
     /**
      * Gets car information by ID (or throws exception if non-existent)
